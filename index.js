@@ -1,8 +1,20 @@
 const express = require('express');
+const morgan = require('morgan');
 
 const app = express();
 
+morgan.token('log-post', (req) => {
+    console.log(req.body);
+
+    if (req.body) {
+        return JSON.stringify(req.body);
+    } else {
+        return '-'
+    }
+})
+
 app.use(express.json());
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :log-post'));
 
 let persons = [
     {
@@ -29,6 +41,11 @@ let persons = [
 
 const RandomId = () => {
     return Math.floor(Math.random() * 10000).toString();
+}
+
+const logNewPerson = (req, res, next) => {
+    return req.body;
+    next();
 }
 
 app.get('/api/info', (req, res) => {
