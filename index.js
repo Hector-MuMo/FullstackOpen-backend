@@ -2,6 +2,8 @@ const express = require('express');
 
 const app = express();
 
+app.use(express.json());
+
 let persons = [
     {
         "id": "1",
@@ -25,6 +27,10 @@ let persons = [
     }
 ]
 
+const RandomId = () => {
+    return Math.floor(Math.random() * 10000).toString();
+}
+
 app.get('/api/info', (req, res) => {
     res.status(200).send(`<p>Phonebook has info of ${persons.length} people<p><p>${Date()}</p>`).end();
 })
@@ -46,6 +52,33 @@ app.get('/api/persons/:id', (req, res) => {
     } else {
         res.status(404).json({ error: 'Person not found' });
     }
+})
+
+app.post('/api/persons', (req, res) => {
+    const person = req.body;
+    const isUnique = persons.find(item => item.name === person.name)
+
+    if (!person?.name && !person?.number) {
+        return res.status(400).json({
+            error: 'name or number missing'
+        })
+    }
+
+    if (isUnique) {
+        return res.status(400).json({
+            error: 'name must be unique'
+        })
+    }
+
+    const newPerson = {
+        id: RandomId(),
+        name: person.name,
+        number: person.number
+    };
+
+    persons = [...persons, newPerson];
+
+    return res.status(201).json(newPerson);
 })
 
 app.delete('/api/persons/:id', (req, res) => {
