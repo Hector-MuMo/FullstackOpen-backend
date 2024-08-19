@@ -4,8 +4,6 @@ const morgan = require('morgan');
 const app = express();
 
 morgan.token('log-post', (req) => {
-    console.log(req.body);
-
     if (req.body) {
         return JSON.stringify(req.body);
     } else {
