@@ -25,6 +25,10 @@ const persons = [
     }
 ]
 
+app.get('/api/info', (req, res) => {
+    res.status(200).send(`<p>Phonebook has info of ${persons.length} people<p><p>${Date()}</p>`).end();
+})
+
 app.get('/api/persons', (req, res) => {
     if (persons && persons.length > 0) {
         return res.status(200).json(persons);
