@@ -1,5 +1,6 @@
 const express = require('express');
 const morgan = require('morgan');
+const cors = require('cors');
 
 const app = express();
 
@@ -11,6 +12,7 @@ morgan.token('log-post', (req) => {
     }
 })
 
+app.use(cors());
 app.use(express.json());
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :log-post'));
 
@@ -39,11 +41,6 @@ let persons = [
 
 const RandomId = () => {
     return Math.floor(Math.random() * 10000).toString();
-}
-
-const logNewPerson = (req, res, next) => {
-    return req.body;
-    next();
 }
 
 app.get('/api/info', (req, res) => {
@@ -98,9 +95,11 @@ app.post('/api/persons', (req, res) => {
 
 app.delete('/api/persons/:id', (req, res) => {
     const id = req.params.id;
+    const personDeleted = persons.find(item => item.id === id);
     persons = persons.filter(item => item.id !== id);
 
-    res.status(204).end();
+    console.log(personDeleted);
+    res.status(200).send(personDeleted).end();
 })
 
 
