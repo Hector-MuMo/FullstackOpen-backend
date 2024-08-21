@@ -15,6 +15,7 @@ morgan.token('log-post', (req) => {
 app.use(cors());
 app.use(express.json());
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :log-post'));
+app.use(express.static('dist'));
 
 let persons = [
     {
