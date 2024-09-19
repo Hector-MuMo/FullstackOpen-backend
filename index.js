@@ -55,7 +55,7 @@ app.get('/api/persons/:id', (req, res) => {
 
 })
 
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', (req, res, next) => {
     const person = req.body;
 
     if (!person?.name && !person?.number) {
@@ -73,13 +73,12 @@ app.post('/api/persons', (req, res) => {
     newPerson.save().then(savedPerson => {
         return res.status(201).json(savedPerson);
     }).catch(error => {
-        console.log(error);
-        res.status(500).send({ error: error.message })
+        next(error);
     })
 
 })
 
-app.delete('/api/persons/:id', (req, res) => {
+app.delete('/api/persons/:id', (req, res, next) => {
     const id = req.params.id;
     Person.findByIdAndDelete(id).then(person => {
         console.log(person);
@@ -90,10 +89,16 @@ app.delete('/api/persons/:id', (req, res) => {
         })
 });
 
-app.put('/api/persons/:id', (req, res) => {
+app.put('/api/persons/:id', (req, res, next) => {
     const id = req.params.id;
     const person = req.body;
-    Person.findByIdAndUpdate(id, person).then(person => {
+
+    Person.schema.path('name').validate(function (value) {
+        return value < 3
+    }, 'The length of the name must have more than 2 characters')
+
+
+    Person.findByIdAndUpdate(id, person, { runValidators: true }).then(person => {
         console.log(person);
         res.status(200).json(person);
     }).catch(error => {
@@ -112,7 +117,9 @@ const errorHandler = (error, request, response, next) => {
     console.error(error.message)
 
     if (error.name === 'CastError') {
-        return response.status(400).send({ error: 'malformatted id' })
+        return response.status(400).send({ error: 'malformatted id' });
+    } else if (error.name === 'ValidationError') {
+        return response.status(400).send({ error: error.message });
     }
 
     next(error)

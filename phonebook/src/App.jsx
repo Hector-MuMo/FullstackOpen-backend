@@ -50,7 +50,6 @@ const App = () => {
             if (isNameIncluded !== undefined | isNumberIncluded !== undefined) {
                 const confirmUpdate = window.confirm(`${newName} or ${newNumber} is already added to phonebook, replace the info?`);
                 const personId = isNameIncluded?.id ?? isNumberIncluded?.id
-                console.log(personId);
 
                 if (confirmUpdate) {
                     personsService.update(personId, newPerson).
@@ -84,8 +83,10 @@ const App = () => {
                         setShowNotification(true);
                     }).
                     catch(error => {
-                        console.log(error);
+                        console.log(error.response.data);
                         setIsSuceed('error');
+                        setNotificationMessage(`${error.response.data.error}`);
+                        setShowNotification(true);
                     }).finally(
                         setTimeout(() => {
                             setShowNotification(false);
