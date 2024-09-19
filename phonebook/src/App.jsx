@@ -50,6 +50,7 @@ const App = () => {
             if (isNameIncluded !== undefined | isNumberIncluded !== undefined) {
                 const confirmUpdate = window.confirm(`${newName} or ${newNumber} is already added to phonebook, replace the info?`);
                 const personId = isNameIncluded?.id ?? isNumberIncluded?.id
+                console.log(personId);
 
                 if (confirmUpdate) {
                     personsService.update(personId, newPerson).
@@ -103,9 +104,10 @@ const App = () => {
         if (confirmDelete) {
             personsService.erase(id).
                 then(personDeleted => {
+                    console.log(personDeleted);
                     setPersons(persons.filter(person => person.id !== personDeleted.id));
                     setIsSuceed('success');
-                    setNotificationMessage(`Deleted ${personDeleted.name}`);
+                    setNotificationMessage(`Deleted ${name}`);
                     setShowNotification(true);
                 }).
                 catch(error => {
@@ -127,7 +129,7 @@ const App = () => {
             setPersons(initialPersons);
         });
 
-    }, [])
+    }, [notificationMessage])
 
 
     const personsList = filter === ''
